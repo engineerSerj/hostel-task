@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <!--choose db-->
+    <preConditions>
+        <dbms type="h2"/>
+    </preConditions>
+
+    <!--like a commit-->
+    <!--tag for empty db-->
+    <changeSet id="0" author="serj">
+        <tagDatabase tag="db_init"/>
+    </changeSet>
+    
+    <include file="version-1.0/db.changelog-version-1.0.xml" relativeToChangelogFile="true"/> <!-- true - save relative path-->
+
+    <changeSet id="5" author="serj">
+        <tagDatabase tag="version-1.0"/>
+    </changeSet>
+
+</databaseChangeLog>
