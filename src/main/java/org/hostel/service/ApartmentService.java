@@ -1,53 +1,45 @@
 package org.hostel.service;
 
-import lombok.RequiredArgsConstructor;
-import org.hostel.domains.Apartment;
-import org.hostel.domains.Category;
-import org.hostel.domains.Guest;
-import org.hostel.repositories.ApartmentRepository;
+import org.hostel.dao.ApartmentDao;
+import org.hostel.entity.Apartment;
+import org.hostel.entity.Category;
+import org.hostel.entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class ApartmentService {
 
+    private final ApartmentDao apartmentDao;
+
     @Autowired
-    private final ApartmentRepository apartmentRepository;
+    public ApartmentService(ApartmentDao apartmentDao) {
+        this.apartmentDao = apartmentDao;
+    }
 
     @Transactional
-    public Apartment add(Apartment apartment) {
-        return apartmentRepository.save(apartment);
+    public void add(Apartment apartment) {
+        apartmentDao.add(apartment);
     }
 
-    /*public Apartment getApartmentByApartmentNumber(int number){
-        return apartmentRepository.getApartmentByApartmentNumber(number);
-    }*/
-
-    public Apartment getById(int id) {
-        return apartmentRepository.getById(id);
-    }
-
-    public List<Guest> getGuestList(int id) {
-        return apartmentRepository.getById(id).getGuestList();
+    public List<Guest> getGuestList(Apartment apartment) {
+        return apartment.getGuestList();
     }
 
     public int getRoomAmount(int id) {
-        return apartmentRepository.getById(id).getRoomAmount();
+        return apartmentDao.getRoomAmount(id);
     }
 
     @Transactional
     public void setCategory(int id, Category category) {
-        Optional<Apartment> apartment = apartmentRepository.findById(id);
-        apartment.ifPresent(value -> value.setCategory(category));
+        apartmentDao.setCategory(id, category);
     }
-    @Transactional
+
     public void remove(int id) {
-        apartmentRepository.deleteById(id);
+        apartmentDao.remove(id);
     }
 }

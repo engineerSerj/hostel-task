@@ -1,58 +1,45 @@
 package org.hostel.service;
 
-import lombok.RequiredArgsConstructor;
-import org.hostel.domains.Apartment;
-import org.hostel.domains.Guest;
-import org.hostel.repositories.GuestRepository;
+import org.hostel.dao.GuestDaoImpl;
+import org.hostel.entity.Apartment;
+import org.hostel.entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GuestService {
 
+    final private GuestDaoImpl guestDaoImpl;
+
     @Autowired
-    GuestRepository guestRepository;
-
-    @Transactional
-    public Guest add(Guest guest) {
-        return guestRepository.save(guest);
+    public GuestService(GuestDaoImpl guestDaoImpl) {
+        this.guestDaoImpl = guestDaoImpl;
     }
 
     @Transactional
+    public void add(Guest guest) {
+        guestDaoImpl.add(guest);
+    }
+
     public void remove(int id) {
-        guestRepository.deleteById(id);
+        guestDaoImpl.remove(id);
     }
 
-    public List<Guest> getAll(int id) {
-        return (List<Guest>) guestRepository.getAllById(id);
+    public List<Guest> getAll () {
+        return guestDaoImpl.getAll();
     }
 
     @Transactional
     public void setApartment(int id, Apartment apartment) {
-        Optional<Guest> guest = guestRepository.findById(id);
-        guest.ifPresent(value -> value.setApartment(apartment));
+       guestDaoImpl.setApartment(id, apartment);
     }
 
     @Transactional
-    public void editGuest(int id, Guest guest) {
-        Optional<Guest> editGuest = guestRepository.findById(id);
-        editGuest.ifPresent(g -> {
-            g.setBirthday(guest.getBirthday());
-            g.setPassport(guest.getPassport());
-            g.setFullName(guest.getFullName());
-            g.setFileNamePhoto(guest.getFileNamePhoto());
-            g.setCheckInDate(guest.getCheckInDate());
-            g.setCheckOutDate(guest.getCheckOutDate());
-        });
-    }
-
-    public Guest getById(int id) {
-        return guestRepository.getById(id);
+    public void editGuest(Guest guest) {
+        guestDaoImpl.editGuest(guest);
     }
 }

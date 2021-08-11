@@ -1,1 +1,1 @@
-drop table apartments;
+drop table users;
