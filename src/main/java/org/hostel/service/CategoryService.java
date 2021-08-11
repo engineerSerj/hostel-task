@@ -1,35 +1,34 @@
 package org.hostel.service;
 
-import org.hostel.dao.CategoryDaoImpl;
-import org.hostel.entity.Category;
-import org.hostel.entity.CategoryName;
+import lombok.RequiredArgsConstructor;
+import org.hostel.domains.Category;
+import org.hostel.domains.CategoryName;
+import org.hostel.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CategoryService {
 
-    private final CategoryDaoImpl categoryDao;
-
     @Autowired
-    public CategoryService(CategoryDaoImpl categoryDao) {
-        this.categoryDao = categoryDao;
-    }
+    private final CategoryRepository categoryRepository;
 
-    @Transactional
-    public void add(Category category) {
-        categoryDao.add(category);
+    public Category add(Category category) {
+       return categoryRepository.save(category);
     }
 
     public void remove(int id) {
-        categoryDao.remove(id);
+        categoryRepository.deleteById(id);
     }
 
     public List<CategoryName> getListCategory() {
-        return categoryDao.getListCategory();
+        return new ArrayList<CategoryName>(Arrays.asList(CategoryName.values()));
     }
 }
