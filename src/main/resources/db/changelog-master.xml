@@ -14,8 +14,46 @@
     <changeSet id="0" author="serj">
         <tagDatabase tag="db_init"/>
     </changeSet>
-    
-    <include file="version-1.0/db.changelog-version-1.0.xml" relativeToChangelogFile="true"/> <!-- true - save relative path-->
+    <changeSet id="1" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/01-create-apartments-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/01-drop-apartments-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="2" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/02-create-category-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/02-drop-category-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="3" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/03-create-guests-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/03-drop-guests-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="4" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/04-create-users-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/04-drop-users-table.sql"/>
+        </rollback>
+    </changeSet>
 
     <changeSet id="5" author="serj">
         <tagDatabase tag="version-1.0"/>

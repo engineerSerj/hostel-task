@@ -4,42 +4,35 @@ import lombok.RequiredArgsConstructor;
 import org.hostel.domains.Apartment;
 import org.hostel.domains.Guest;
 import org.hostel.repositories.GuestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class GuestService {
 
-    @Autowired
-    GuestRepository guestRepository;
+    private final GuestRepository guestRepository;
 
-    @Transactional
     public Guest add(Guest guest) {
         return guestRepository.save(guest);
     }
 
-    @Transactional
     public void remove(int id) {
         guestRepository.deleteById(id);
     }
 
-    public List<Guest> getAll(int id) {
-        return (List<Guest>) guestRepository.getAllById(id);
+    public List<Guest> getAll() {
+        return guestRepository.findAll();
     }
 
-    @Transactional
     public void setApartment(int id, Apartment apartment) {
         Optional<Guest> guest = guestRepository.findById(id);
         guest.ifPresent(value -> value.setApartment(apartment));
     }
 
-    @Transactional
     public void editGuest(int id, Guest guest) {
         Optional<Guest> editGuest = guestRepository.findById(id);
         editGuest.ifPresent(g -> {

@@ -8,5 +8,5 @@ import java.util.Collection;
 
 @Repository
 public interface GuestRepository extends JpaRepository<Guest, Integer> {
-    Collection<Guest> getAllById (int id);
+
 }

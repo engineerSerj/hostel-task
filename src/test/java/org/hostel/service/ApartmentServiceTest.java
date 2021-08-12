@@ -13,20 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(locations="classpath:application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ApartmentServiceTest {
-
-    @Autowired
-    ApartmentService apartmentService;
-
-
-    @Test
-    public void testAdd(){
-        Apartment apartment = new Apartment();
-        Assert.assertNotNull(apartmentService.add(apartment));
-
-    }
-
 
 }
