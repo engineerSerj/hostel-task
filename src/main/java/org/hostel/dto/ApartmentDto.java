@@ -3,24 +3,22 @@ package org.hostel.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hostel.domains.Apartment;
-import org.hostel.domains.Category;
-import org.hostel.domains.Guest;
+import org.hostel.domain.Apartment;
+import org.hostel.domain.Category;
+import org.hostel.domain.Guest;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @RequiredArgsConstructor
 public class ApartmentDto {
-    private int id;
+    private long id;
     private int apartmentNumber;
     private int roomAmount;
     private List<Guest> guestList;
     private Category category;
-    private Date cleaningDate;
+    private LocalDateTime cleaningDate;
 
     public ApartmentDto(Apartment apartment)  {
         this.id = apartment.getId();

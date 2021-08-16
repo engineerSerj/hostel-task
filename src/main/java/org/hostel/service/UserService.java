@@ -1,11 +1,13 @@
 package org.hostel.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hostel.Exceptions.UserNotFoundException;
-import org.hostel.domains.Role;
-import org.hostel.domains.User;
+import org.hostel.exception.UserNotFoundException;
+import org.hostel.domain.Role;
+import org.hostel.domain.User;
 import org.hostel.dto.UserDto;
-import org.hostel.repositories.UserRepository;
+import org.hostel.repositoriy.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,21 +18,26 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void add(UserDto userDto) {
+    public ResponseEntity<?> add(UserDto userDto) {
         userRepository.save(new User(userDto));
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    public void remove(int id) {
+    public ResponseEntity<?> remove(long id) {
         userRepository.deleteById(id);
+        return !userRepository.findById(id).isPresent() ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    public UserDto setRole(int id, Role role) throws UserNotFoundException {
+    public ResponseEntity<UserDto> setRole(long id, Role role) throws UserNotFoundException {
         User user = getById(id);
         user.setRole(role);
-        return new UserDto(user);
+        if (user.getRole().equals(role)) {
+            return new ResponseEntity<>(new UserDto(user), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    public User getById(int id) throws UserNotFoundException {
+    public User getById(long id) throws UserNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 }

@@ -1,8 +1,7 @@
 package org.hostel;
 
-import lombok.RequiredArgsConstructor;
-import org.hostel.repositories.ApartmentRepository;
-import org.hostel.repositories.CategoryRepository;
+import org.hostel.repositoriy.ApartmentRepository;
+import org.hostel.repositoriy.CategoryRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

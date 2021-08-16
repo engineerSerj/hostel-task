@@ -2,14 +2,14 @@ package org.hostel.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hostel.domains.Role;
-import org.hostel.domains.User;
+import org.hostel.domain.Role;
+import org.hostel.domain.User;
 
 @Data
 @RequiredArgsConstructor
 public class UserDto {
 
-    private int id;
+    private long id;
     private String name;
     private Role role;
 
