@@ -7,12 +7,12 @@ create table if not exists users
 );
 
 alter table apartments
-    add constraint FK83fae4lf85ehdwvvuhq15iio
-        foreign key (apartment_id)
+    add constraint FK6rnw02aco9vjs982ske31aakv
+        foreign key (category_id)
             references categories;
 
 
 alter table guests
-    add constraint FK19ymgrma8yweb18c7q614kox9
-        foreign key (guest_id)
+    add constraint FKpljc5pnqdqt5ujk3vduj7gvie
+        foreign key (apartment_id)
             references apartments;

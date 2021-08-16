@@ -1,37 +1,34 @@
-package org.hostel.domains;
+package org.hostel.dto;
 
-import lombok.*;
-import org.hostel.dto.ApartmentDto;
-import javax.persistence.*;
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.hostel.domains.Apartment;
+import org.hostel.domains.Category;
+import org.hostel.domains.Guest;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @RequiredArgsConstructor
-@Entity
-@Table(name="apartments")
-public class Apartment {
-
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+public class ApartmentDto {
     private int id;
     private int apartmentNumber;
     private int roomAmount;
-    @OneToMany(mappedBy = "apartment", fetch=FetchType.EAGER)
     private List<Guest> guestList;
-    @ManyToOne
-    @JoinColumn (name="category_id")
     private Category category;
-    @Temporal(TemporalType.TIMESTAMP)
     private Date cleaningDate;
 
-    public Apartment (ApartmentDto apartment){
+    public ApartmentDto(Apartment apartment)  {
         this.id = apartment.getId();
         this.apartmentNumber = apartment.getApartmentNumber();
         this.roomAmount = apartment.getRoomAmount();
         this.guestList = apartment.getGuestList();
         this.category = apartment.getCategory();
         this.cleaningDate = apartment.getCleaningDate();
+
     }
 }

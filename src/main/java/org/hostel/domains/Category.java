@@ -1,9 +1,9 @@
 package org.hostel.domains;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import org.hostel.dto.CategoryDto;
 
 import javax.persistence.*;
 
@@ -18,4 +18,10 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryName categoryName;
     private String description;
+
+    public Category (CategoryDto category){
+        this.id = category.getId();
+        this.categoryName = category.getCategoryName();
+        this.description = category.getDescription();
+    }
 }

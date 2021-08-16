@@ -1,23 +1,19 @@
-package org.hostel.domains;
+package org.hostel.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hostel.dto.UserDto;
-import javax.persistence.*;
+import org.hostel.domains.Role;
+import org.hostel.domains.User;
 
 @Data
 @RequiredArgsConstructor
-@Entity
-@Table(name = "users")
-public class User {
+public class UserDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private Role role;
 
-    public User(UserDto user) {
+    public UserDto(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.role = user.getRole();

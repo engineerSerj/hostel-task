@@ -4,6 +4,6 @@ create table if not exists apartments
     apartment_number integer,
     cleaning_date    timestamp,
     room_amount      integer,
-    apartment_id     integer,
+    category_id      integer,
     primary key (id)
 );
