@@ -54,8 +54,33 @@
                      path="version-1.0/04-drop-users-table.sql"/>
         </rollback>
     </changeSet>
-
     <changeSet id="5" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/05-create-roles-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/05-drop-roles-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="6" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/06-create-user_roles-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/06-drop-user_roles-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="7" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/07-create-roles.sql"/>
+    </changeSet>
+
+    <changeSet id="8" author="serj">
         <tagDatabase tag="version-1.0"/>
     </changeSet>
 

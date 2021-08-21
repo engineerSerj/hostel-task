@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hostel.dto.UserDto;
 import javax.persistence.*;
+import java.util.*;
+
 
 @Data
 @RequiredArgsConstructor
@@ -14,12 +16,23 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;
-    private Role role;
+    private String username;
+    private String password;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     public User(UserDto user) {
         this.id = user.getId();
-        this.name = user.getName();
-        this.role = user.getRole();
+        this.username = user.getUsername();
+        //this.roles = user.getRoles().stream().map(role-> new Role(role));
+        this.password = user.getPassword();
+    }
+
+    public User(String username, String encode) {
+        this.username = username;
+        this.password = encode;
     }
 }

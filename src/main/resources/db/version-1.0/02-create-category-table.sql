@@ -5,3 +5,8 @@ create table if not exists categories
     description   varchar(255),
     primary key (id)
 );
+
+alter table apartments
+    add constraint FK6rnw02aco9vjs982ske31aakv
+        foreign key (category_id)
+            references categories;

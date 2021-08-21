@@ -1,6 +1,7 @@
 package org.hostel.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hostel.exception.CategoryNotFoundException;
 import org.hostel.exception.GuestNotFoundException;
 import org.hostel.domain.Apartment;
 import org.hostel.domain.Guest;
@@ -22,19 +23,23 @@ public class GuestService {
     private final GuestRepository guestRepository;
     private final ApartmentRepository apartmentRepository;
 
-    public ResponseEntity<?> add(GuestDto guestDto) {
+    public ResponseEntity<GuestDto> add(GuestDto guestDto) {
         guestRepository.save(new Guest(guestDto));
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(guestDto, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> remove(long id) {
-        guestRepository.deleteById(id);
-        return !guestRepository.findById(id).isPresent() ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    public ResponseEntity<GuestDto> remove(long id) throws CategoryNotFoundException {
+        if (guestRepository.findById(id).isPresent()) {
+            guestRepository.deleteById(id);
+        } else {
+            throw new CategoryNotFoundException(id);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public ResponseEntity<GuestDto> setApartment(long guestId, long apartmentId) throws GuestNotFoundException {
-        Guest guest = getById(guestId);
-        Apartment apartment = apartmentRepository.getById(apartmentId);
+        Guest guest = guestRepository.findById(guestId).orElseThrow(() -> new GuestNotFoundException(guestId));
+        Apartment apartment = apartmentRepository.findById(apartmentId).orElseThrow(() -> new GuestNotFoundException(apartmentId));
         guest.setApartment(apartment);
         if (guest.getApartment().getId() == apartmentId) {
             return new ResponseEntity<>(new GuestDto(guest), HttpStatus.OK);
@@ -50,8 +55,5 @@ public class GuestService {
     public ResponseEntity<List<Guest>> getAll() {
         return new ResponseEntity<>(guestRepository.findAll(), HttpStatus.OK);
     }
-
-    public Guest getById(long id) throws GuestNotFoundException {
-        return guestRepository.findById(id).orElseThrow(() -> new GuestNotFoundException(id));
-    }
 }
+

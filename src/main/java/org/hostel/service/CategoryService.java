@@ -23,22 +23,22 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public ResponseEntity<?> add(CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> add(CategoryDto categoryDto) {
         categoryRepository.save(new Category(categoryDto));
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(categoryDto, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> remove(long id) {
-        categoryRepository.deleteById(id);
-        return !categoryRepository.findById(id).isPresent() ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    public ResponseEntity<CategoryDto> remove(long id) throws CategoryNotFoundException {
+        if (categoryRepository.findById(id).isPresent()) {
+            categoryRepository.deleteById(id);
+        } else {
+            throw new CategoryNotFoundException(id);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public ResponseEntity<List<CategoryName>> getCategoryList() {
         List<CategoryName> categoryList = new ArrayList<>(Arrays.asList(CategoryName.values()));
         return new ResponseEntity<>(categoryList, HttpStatus.OK);
-    }
-
-    public Category getById(long id) throws CategoryNotFoundException {
-        return categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
     }
 }

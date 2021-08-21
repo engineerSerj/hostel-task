@@ -10,3 +10,8 @@ create table if not exists guests
     apartment_id    integer,
     primary key (id)
 );
+
+alter table guests
+    add constraint FKpljc5pnqdqt5ujk3vduj7gvie
+        foreign key (apartment_id)
+            references apartments;

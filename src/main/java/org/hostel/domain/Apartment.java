@@ -1,6 +1,5 @@
 package org.hostel.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hostel.dto.ApartmentDto;
 import org.hostel.util.DateTimeUtil;

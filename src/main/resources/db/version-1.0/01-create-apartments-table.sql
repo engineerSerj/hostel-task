@@ -7,3 +7,4 @@ create table if not exists apartments
     category_id      integer,
     primary key (id)
 );
+
