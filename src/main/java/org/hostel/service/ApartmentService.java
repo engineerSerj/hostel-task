@@ -27,8 +27,7 @@ public class ApartmentService {
     private final GuestRepository guestRepository;
 
     public ResponseEntity<ApartmentDto> add(ApartmentDto apartmentDto) {
-        apartmentRepository.save(new Apartment(apartmentDto));
-        return new ResponseEntity<>(apartmentDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApartmentDto(apartmentRepository.save(new Apartment(apartmentDto))), HttpStatus.CREATED);
     }
 
     public ResponseEntity<ApartmentDto> remove(long id) throws ApartmentNotFoundException {
@@ -42,7 +41,7 @@ public class ApartmentService {
 
     public ResponseEntity<ApartmentDto> setCategory(long apartmentId, long categoryId) throws ApartmentNotFoundException, CategoryNotFoundException {
         Apartment apartment = apartmentRepository.findById(apartmentId).orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(apartmentId));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
         apartment.setCategory(category);
         if (apartment.getCategory().getId() == categoryId) {
             return new ResponseEntity<>(new ApartmentDto(apartment), HttpStatus.OK);

@@ -24,8 +24,7 @@ public class GuestService {
     private final ApartmentRepository apartmentRepository;
 
     public ResponseEntity<GuestDto> add(GuestDto guestDto) {
-        guestRepository.save(new Guest(guestDto));
-        return new ResponseEntity<>(guestDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(new GuestDto(guestRepository.save(new Guest(guestDto))), HttpStatus.CREATED);
     }
 
     public ResponseEntity<GuestDto> remove(long id) throws CategoryNotFoundException {

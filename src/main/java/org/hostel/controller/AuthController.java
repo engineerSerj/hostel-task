@@ -1,12 +1,11 @@
 package org.hostel.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.hostel.dto.RoleDto;
+import org.hostel.dto.RefreshTokenUserDto;
+import org.hostel.dto.RegistredUserDto;
 import org.hostel.dto.UserDto;
-import org.hostel.exception.RoleAlreadyExists;
-import org.hostel.exception.RoleNotFoundException;
-import org.hostel.exception.UserAlreadyExists;
-import org.hostel.service.RoleService;
+import org.hostel.exception.*;
+import org.hostel.service.RefreshTokenService;
 import org.hostel.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,16 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signin")
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) {
         return userService.authenticateUser(userDto);
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) throws RoleNotFoundException, UserAlreadyExists {
+    public ResponseEntity<RegistredUserDto> registerUser(@RequestBody RegistredUserDto userDto) throws RoleNotFoundException, UserAlreadyExists {
         // Create new user's account
         return userService.add(userDto);
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(@RequestBody RefreshTokenUserDto refreshTokenRequest) throws RefreshTokenNotFoundException, TokenRefreshException {
+        return refreshTokenService.refreshtoken(refreshTokenRequest);
     }
 }
 

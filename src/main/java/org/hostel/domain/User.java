@@ -2,6 +2,7 @@ package org.hostel.domain;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hostel.dto.RegistredUserDto;
 import org.hostel.dto.UserDto;
 import javax.persistence.*;
 import java.util.*;
@@ -24,15 +25,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User(UserDto user) {
+    public User(RegistredUserDto user) {
         this.id = user.getId();
         this.username = user.getUsername();
-        //this.roles = user.getRoles().stream().map(role-> new Role(role));
         this.password = user.getPassword();
     }
 
-    public User(String username, String encode) {
-        this.username = username;
-        this.password = encode;
-    }
 }

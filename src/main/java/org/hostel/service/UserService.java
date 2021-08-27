@@ -1,7 +1,9 @@
 package org.hostel.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hostel.domain.RefreshToken;
 import org.hostel.domain.RoleName;
+import org.hostel.dto.RegistredUserDto;
 import org.hostel.dto.RoleDto;
 
 import org.hostel.exception.*;
@@ -38,11 +40,12 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
+    private final RefreshTokenService refreshTokenService;
 
-    public ResponseEntity<UserDto> add(UserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
+    public ResponseEntity<RegistredUserDto> add(RegistredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
 
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            // throw new UserAlreadyExists(userDto.getUsername());
+             //throw new UserAlreadyExists(userDto.getUsername());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // Create new user's account
@@ -56,7 +59,9 @@ public class UserService {
             userRoles.add(role);
         }
         user.setRoles(userRoles);
-        return new ResponseEntity<>(new UserDto(userRepository.save(user)), HttpStatus.CREATED);
+        RegistredUserDto registredUserDto = new RegistredUserDto(userRepository.save(user));
+        registredUserDto.setPassword(userDto.getPassword());
+        return new ResponseEntity<>(registredUserDto, HttpStatus.CREATED);
     }
 
     public ResponseEntity<UserDto> remove(long id) throws CategoryNotFoundException {
@@ -79,19 +84,24 @@ public class UserService {
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
         UserDto userDtoWithToken = new UserDto(jwt,
+                refreshToken.getToken(),
                 userDetails.getId(),
                 userDetails.getUsername(),
                 roles);
@@ -99,3 +109,4 @@ public class UserService {
         return new ResponseEntity<>(userDtoWithToken, HttpStatus.OK);
     }
 }
+

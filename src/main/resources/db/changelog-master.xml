@@ -77,10 +77,20 @@
     <changeSet id="7" author="serj">
         <sqlFile relativeToChangelogFile="true"
                  splitStatements="true"
-                 path="version-1.0/07-create-roles.sql"/>
+                 path="version-1.0/07-create-refreshtoken-table.sql"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true"
+                     splitStatements="true"
+                     path="version-1.0/07-drop-refreshtoken-table.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="8" author="serj">
+        <sqlFile relativeToChangelogFile="true"
+                 splitStatements="true"
+                 path="version-1.0/08-create-roles.sql"/>
     </changeSet>
 
-    <changeSet id="8" author="serj">
+    <changeSet id="9" author="serj">
         <tagDatabase tag="version-1.0"/>
     </changeSet>
 

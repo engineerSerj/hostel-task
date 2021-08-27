@@ -24,8 +24,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public ResponseEntity<CategoryDto> add(CategoryDto categoryDto) {
-        categoryRepository.save(new Category(categoryDto));
-        return new ResponseEntity<>(categoryDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(new CategoryDto(categoryRepository.save(new Category(categoryDto))), HttpStatus.CREATED);
     }
 
     public ResponseEntity<CategoryDto> remove(long id) throws CategoryNotFoundException {

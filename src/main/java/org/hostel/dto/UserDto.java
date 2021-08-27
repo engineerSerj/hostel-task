@@ -10,21 +10,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDto {
     private String token;
-    private String type = "Bearer";
+    private final String type = "Bearer";
+    private String refreshToken;
     private long id;
     private String username;
-    private String password;
     private List <String> roles;
 
     public UserDto(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
-        this.password = user.getPassword();
         this.roles = user.getRoles().stream().map(role->role.getRoleName().name()).collect(Collectors.toList());
     }
 
-    public UserDto(String accessToken, Long id, String username, List<String> roles) {
+    public UserDto(String accessToken, String refreshToken, Long id, String username, List<String> roles) {
         this.token = accessToken;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.username = username;
         this.roles = roles;
