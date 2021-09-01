@@ -45,7 +45,6 @@ public class UserService {
     public ResponseEntity<RegistredUserDto> add(RegistredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
 
         if (userRepository.existsByUsername(userDto.getUsername())) {
-             //throw new UserAlreadyExists(userDto.getUsername());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // Create new user's account

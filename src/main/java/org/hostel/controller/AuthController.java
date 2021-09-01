@@ -4,14 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.hostel.dto.RefreshTokenUserDto;
 import org.hostel.dto.RegistredUserDto;
 import org.hostel.dto.UserDto;
-import org.hostel.exception.*;
+import org.hostel.exception.RefreshTokenNotFoundException;
+import org.hostel.exception.TokenRefreshException;
+import org.hostel.jms.UserRegistrationTopicListener;
 import org.hostel.service.RefreshTokenService;
 import org.hostel.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.jms.ObjectMessage;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,6 +27,11 @@ public class AuthController {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final UserRegistrationTopicListener userRegistrationTopicListener;
+
+    @Autowired
+    @Qualifier("topicJmsTemplate")
+    private JmsTemplate topicJmsTemplate;
 
     @PostMapping("/signin")
     public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) {
@@ -27,9 +39,15 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistredUserDto> registerUser(@RequestBody RegistredUserDto userDto) throws RoleNotFoundException, UserAlreadyExists {
+    public ResponseEntity<RegistredUserDto> registerUser(@RequestBody RegistredUserDto userDto) {
         // Create new user's account
-        return userService.add(userDto);
+        topicJmsTemplate.setPubSubDomain(true);
+        topicJmsTemplate.send("topic", session -> {
+            ObjectMessage objectMessage = session.createObjectMessage();
+            objectMessage.setObject(userDto);
+            return objectMessage;
+        });
+        return userRegistrationTopicListener.getResponseEntity();
     }
 
     @PostMapping("/refreshtoken")

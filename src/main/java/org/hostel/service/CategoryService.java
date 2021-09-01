@@ -30,10 +30,10 @@ public class CategoryService {
     public ResponseEntity<CategoryDto> remove(long id) throws CategoryNotFoundException {
         if (categoryRepository.findById(id).isPresent()) {
             categoryRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            throw new CategoryNotFoundException(id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public ResponseEntity<List<CategoryName>> getCategoryList() {

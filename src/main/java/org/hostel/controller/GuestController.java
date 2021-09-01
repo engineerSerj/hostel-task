@@ -9,7 +9,9 @@ import org.hostel.service.GuestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequestMapping("/api/guest")
@@ -21,8 +23,8 @@ public class GuestController {
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPTIONIST')")
-    public ResponseEntity<?> add(@RequestBody GuestDto guestDto) {
-        return guestService.add(guestDto);
+    public ResponseEntity<?> add(@RequestBody GuestDto guestDto, @RequestParam("file") MultipartFile file) throws IOException {
+        return guestService.add(guestDto,file);
     }
 
     @DeleteMapping("/{id}")

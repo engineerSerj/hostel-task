@@ -3,9 +3,10 @@ package org.hostel.domain;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hostel.dto.RegistredUserDto;
-import org.hostel.dto.UserDto;
+
 import javax.persistence.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data

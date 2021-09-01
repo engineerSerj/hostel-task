@@ -2,10 +2,10 @@ package org.hostel.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.hostel.dto.RoleDto;
+import org.hostel.dto.UserDto;
 import org.hostel.exception.CategoryNotFoundException;
 import org.hostel.exception.RoleAlreadyExists;
 import org.hostel.exception.UserNotFoundException;
-import org.hostel.dto.UserDto;
 import org.hostel.service.RoleService;
 import org.hostel.service.UserService;
 import org.springframework.http.ResponseEntity;

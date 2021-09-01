@@ -2,9 +2,9 @@ package org.hostel.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.hostel.domain.Guest;
+import org.hostel.dto.ApartmentDto;
 import org.hostel.exception.ApartmentNotFoundException;
 import org.hostel.exception.CategoryNotFoundException;
-import org.hostel.dto.ApartmentDto;
 import org.hostel.service.ApartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

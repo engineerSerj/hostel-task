@@ -3,12 +3,16 @@ package org.hostel.controller;
 import lombok.RequiredArgsConstructor;
 import org.hostel.domain.CategoryName;
 import org.hostel.dto.CategoryDto;
-import org.hostel.exception.CategoryNotFoundException;
+import org.hostel.jms.CategoryRemoveByIdQueueConsumer;
 import org.hostel.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jms.Queue;
 import java.util.List;
 
 @RequestMapping("/api/category")
@@ -17,6 +21,12 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final Queue queue;
+    private final CategoryRemoveByIdQueueConsumer consumer;
+
+    @Autowired
+    @Qualifier("queueJmsTemplate")
+    private JmsTemplate queueJmsTemplate;
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -26,8 +36,9 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> remove(@PathVariable("id") long id) throws CategoryNotFoundException {
-        return categoryService.remove(id);
+    public ResponseEntity<?> remove(@PathVariable("id") String id)  {
+        queueJmsTemplate.convertAndSend(queue, id);
+        return consumer.getResponseEntity();
     }
 
     @GetMapping("/categoryList")

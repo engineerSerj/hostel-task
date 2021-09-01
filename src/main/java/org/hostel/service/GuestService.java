@@ -8,12 +8,18 @@ import org.hostel.domain.Guest;
 import org.hostel.dto.GuestDto;
 import org.hostel.repositoriy.ApartmentRepository;
 import org.hostel.repositoriy.GuestRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +29,25 @@ public class GuestService {
     private final GuestRepository guestRepository;
     private final ApartmentRepository apartmentRepository;
 
-    public ResponseEntity<GuestDto> add(GuestDto guestDto) {
-        return new ResponseEntity<>(new GuestDto(guestRepository.save(new Guest(guestDto))), HttpStatus.CREATED);
+    @Value("${upload.path}")
+    private String uploadPath;
+
+    public ResponseEntity<GuestDto> add(GuestDto guestDto, MultipartFile file) throws IOException {
+        Guest guestToSave = new Guest(guestDto);
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFileName = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/" + resultFileName));
+            guestToSave.setFileNamePhoto(resultFileName);
+        }
+
+        return new ResponseEntity<>(new GuestDto(guestRepository.save(guestToSave)), HttpStatus.CREATED);
     }
 
     public ResponseEntity<GuestDto> remove(long id) throws CategoryNotFoundException {
