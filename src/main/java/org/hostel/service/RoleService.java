@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.hostel.domain.Role;
 import org.hostel.dto.RoleDto;
 import org.hostel.repositoriy.RoleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,15 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    public ResponseEntity<RoleDto> createRole (RoleDto roleDto) {
-        return new ResponseEntity<>(new RoleDto(roleRepository.save(new Role(roleDto))), HttpStatus.CREATED);
+    private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
+
+    public ResponseEntity<RoleDto> createRole(RoleDto roleDto) {
+        if (roleRepository.existsByRoleName(roleDto.getRoleName())) {
+            logger.warn("role already exists with role name {}", roleDto.getRoleName().name());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        Role role = roleRepository.save(new Role(roleDto));
+        logger.info("create role {} with id {}", role.getRoleName().name(), role.getId());
+        return new ResponseEntity<>(new RoleDto(role), HttpStatus.CREATED);
     }
 }

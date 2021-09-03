@@ -10,10 +10,13 @@ import org.hostel.exception.*;
 import org.hostel.domain.Role;
 import org.hostel.domain.User;
 import org.hostel.dto.UserDto;
+import org.hostel.jms.UserRegistrationTopicListener;
 import org.hostel.repositoriy.RoleRepository;
 import org.hostel.repositoriy.UserRepository;
 import org.hostel.security.jwt.JwtUtils;
 import org.hostel.security.util.UserDetailsImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,9 +45,12 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     public ResponseEntity<RegistredUserDto> add(RegistredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
 
         if (userRepository.existsByUsername(userDto.getUsername())) {
+            logger.warn("user already exists with name {}", userDto.getUsername());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // Create new user's account
@@ -60,16 +66,19 @@ public class UserService {
         user.setRoles(userRoles);
         RegistredUserDto registredUserDto = new RegistredUserDto(userRepository.save(user));
         registredUserDto.setPassword(userDto.getPassword());
+        logger.info("user with name {} and id {} registered", registredUserDto.getUsername(), registredUserDto.getId());
         return new ResponseEntity<>(registredUserDto, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<UserDto> remove(long id) throws CategoryNotFoundException {
+    public ResponseEntity<UserDto> remove(long id) throws UserNotFoundException {
         if (userRepository.findById(id).isPresent()) {
             userRepository.deleteById(id);
+            logger.info("remove user with id {}", id);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            throw new CategoryNotFoundException(id);
+            logger.info("user is not exists with id {}", id);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public ResponseEntity<UserDto> setRole(long id, RoleDto roleDto) throws UserNotFoundException {
@@ -77,20 +86,22 @@ public class UserService {
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(new Role(roleDto));
         user.setRoles(userRoles);
-        if (user.getRoles().contains(roleDto)) {
+        if (user.getRoles().contains(new Role(roleDto))) {
+            logger.info("set role with name {} for user {}", roleDto.getRoleName(), user.getUsername());
             return new ResponseEntity<>(new UserDto(user), HttpStatus.OK);
         }
+        logger.info("set role filed with name {} for user {}", roleDto.getRoleName(), user.getUsername());
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) {
+    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) throws UserNotFoundException {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
@@ -104,7 +115,7 @@ public class UserService {
                 userDetails.getId(),
                 userDetails.getUsername(),
                 roles);
-
+        logger.info("user with name {} and id {} authenticated", userDtoWithToken.getUsername(), userDtoWithToken.getId());
         return new ResponseEntity<>(userDtoWithToken, HttpStatus.OK);
     }
 }

@@ -36,7 +36,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> remove(@PathVariable("id") String id)  {
+    public ResponseEntity<?> remove(@PathVariable("id") String id) {
         queueJmsTemplate.convertAndSend(queue, id);
         return consumer.getResponseEntity();
     }

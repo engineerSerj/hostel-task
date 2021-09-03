@@ -3,8 +3,6 @@ package org.hostel.controller;
 import lombok.RequiredArgsConstructor;
 import org.hostel.dto.RoleDto;
 import org.hostel.dto.UserDto;
-import org.hostel.exception.CategoryNotFoundException;
-import org.hostel.exception.RoleAlreadyExists;
 import org.hostel.exception.UserNotFoundException;
 import org.hostel.service.RoleService;
 import org.hostel.service.UserService;
@@ -22,7 +20,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> remove(@PathVariable("id") long id) throws CategoryNotFoundException {
+    public ResponseEntity<?> remove(@PathVariable("id") long id) throws UserNotFoundException {
         return userService.remove(id);
     }
 
@@ -34,7 +32,7 @@ public class UserController {
 
     @PostMapping("/newRole")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) throws RoleAlreadyExists {
+    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto roleDto) {
         return roleService.createRole(roleDto);
     }
 }

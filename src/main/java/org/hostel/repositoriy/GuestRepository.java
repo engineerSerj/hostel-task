@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface GuestRepository extends JpaRepository<Guest, Long> {
     List<Guest> findAllByApartment(Apartment apartment);
+
+    boolean existsByFullName(String fullName);
 }

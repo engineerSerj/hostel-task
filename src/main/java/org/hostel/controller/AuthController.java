@@ -6,9 +6,12 @@ import org.hostel.dto.RegistredUserDto;
 import org.hostel.dto.UserDto;
 import org.hostel.exception.RefreshTokenNotFoundException;
 import org.hostel.exception.TokenRefreshException;
+import org.hostel.exception.UserNotFoundException;
 import org.hostel.jms.UserRegistrationTopicListener;
 import org.hostel.service.RefreshTokenService;
 import org.hostel.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +37,7 @@ public class AuthController {
     private JmsTemplate topicJmsTemplate;
 
     @PostMapping("/signin")
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) {
+    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) throws UserNotFoundException {
         return userService.authenticateUser(userDto);
     }
 

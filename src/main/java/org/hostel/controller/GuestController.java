@@ -24,12 +24,12 @@ public class GuestController {
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPTIONIST')")
     public ResponseEntity<?> add(@RequestBody GuestDto guestDto, @RequestParam("file") MultipartFile file) throws IOException {
-        return guestService.add(guestDto,file);
+        return guestService.add(guestDto, file);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPTIONIST')")
-    public ResponseEntity<?> remove(@PathVariable("id") long id) throws CategoryNotFoundException {
+    public ResponseEntity<?> remove(@PathVariable("id") long id) {
         return guestService.remove(id);
     }
 

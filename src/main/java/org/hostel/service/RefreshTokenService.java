@@ -6,9 +6,12 @@ import org.hostel.domain.User;
 import org.hostel.dto.RefreshTokenUserDto;
 import org.hostel.exception.RefreshTokenNotFoundException;
 import org.hostel.exception.TokenRefreshException;
+import org.hostel.exception.UserNotFoundException;
 import org.hostel.repositoriy.RefreshTokenRepository;
 import org.hostel.repositoriy.UserRepository;
 import org.hostel.security.jwt.JwtUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,14 +32,16 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
+    private static final Logger logger = LoggerFactory.getLogger(RefreshTokenService.class);
+
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
-    public RefreshToken createRefreshToken(Long userId) {
+    public RefreshToken createRefreshToken(Long userId) throws UserNotFoundException {
         RefreshToken refreshToken = new RefreshToken();
 
-        refreshToken.setUser(userRepository.findById(userId).get());
+        refreshToken.setUser(userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId)));
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
@@ -58,6 +63,7 @@ public class RefreshTokenService {
         refreshToken = verifyExpiration(refreshToken);
         User user = refreshToken.getUser();
         String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+        logger.info("refreshTokenRequest updated");
         return ResponseEntity.ok(new RefreshTokenUserDto(token, requestRefreshToken));
     }
 }
