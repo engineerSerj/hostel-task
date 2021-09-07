@@ -1,7 +1,6 @@
 package org.hostel.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hostel.controller.ApartmentController;
 import org.hostel.exception.ApartmentNotFoundException;
 import org.hostel.exception.CategoryNotFoundException;
 import org.hostel.domain.Apartment;
@@ -13,6 +12,8 @@ import org.hostel.repositoriy.CategoryRepository;
 import org.hostel.repositoriy.GuestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "apartments")
 public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
@@ -33,7 +35,7 @@ public class ApartmentService {
 
     public ResponseEntity<ApartmentDto> add(ApartmentDto apartmentDto) {
         if (apartmentRepository.existsByApartmentNumber(apartmentDto.getApartmentNumber())) {
-            logger.warn("apartment already exists with apartment number {}", apartmentDto.getApartmentNumber());
+            logger.error("apartment already exists with apartment number {}", apartmentDto.getApartmentNumber());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         Apartment apartment = apartmentRepository.save(new Apartment(apartmentDto));
@@ -47,7 +49,7 @@ public class ApartmentService {
             logger.info("remove apartment with id {}", id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            logger.warn("apartment not found with id {}", id);
+            logger.error("apartment not found with id {}", id);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
@@ -60,10 +62,11 @@ public class ApartmentService {
             logger.info("set category with id {} for apartment with id {}", category.getId(), apartment.getId());
             return new ResponseEntity<>(new ApartmentDto(apartment), HttpStatus.OK);
         }
-        logger.warn("set category failed with id {} for apartment with id {}", category.getId(), apartment.getId());
+        logger.error("set category failed with id {} for apartment with id {}", category.getId(), apartment.getId());
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    @Cacheable("guests")
     public ResponseEntity<List<Guest>> getGuestList(long id) throws ApartmentNotFoundException {
         Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new ApartmentNotFoundException(id));
         List<Guest> guests = guestRepository.findAllByApartment(apartment);
@@ -71,10 +74,11 @@ public class ApartmentService {
             logger.info("get guest list for apartment with id {}", apartment.getId());
             return new ResponseEntity<>(guests, HttpStatus.OK);
         }
-        logger.warn("guest list is empty for apartment with id {}", apartment.getId());
+        logger.error("guest list is empty for apartment with id {}", apartment.getId());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @Cacheable("apartments")
     public ResponseEntity<Integer> getRoomAmount(long id) throws ApartmentNotFoundException {
         Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new ApartmentNotFoundException(id));
         int roomAmount = apartment.getRoomAmount();
@@ -82,7 +86,7 @@ public class ApartmentService {
         logger.info("get room amount for apartment with id {}", apartment.getId());
         return new ResponseEntity<>(roomAmount, HttpStatus.OK);
         }
-        logger.warn("room amount not found for apartment with id {}", apartment.getId());
+        logger.error("room amount not found for apartment with id {}", apartment.getId());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

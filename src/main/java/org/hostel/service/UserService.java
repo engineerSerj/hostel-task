@@ -10,7 +10,6 @@ import org.hostel.exception.*;
 import org.hostel.domain.Role;
 import org.hostel.domain.User;
 import org.hostel.dto.UserDto;
-import org.hostel.jms.UserRegistrationTopicListener;
 import org.hostel.repositoriy.RoleRepository;
 import org.hostel.repositoriy.UserRepository;
 import org.hostel.security.jwt.JwtUtils;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor

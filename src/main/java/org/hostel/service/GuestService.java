@@ -10,6 +10,10 @@ import org.hostel.repositoriy.GuestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@CacheConfig(cacheNames = "guests")
 public class GuestService {
 
     private final GuestRepository guestRepository;
@@ -35,9 +40,10 @@ public class GuestService {
     @Value("${upload.path}")
     private String uploadPath;
 
+    @CachePut(value = "guests", key = "#guestDto.fullName")
     public ResponseEntity<GuestDto> add(GuestDto guestDto, MultipartFile file) throws IOException {
         if (guestRepository.existsByFullName(guestDto.getFullName())) {
-            logger.warn("guest already exists with full name {}", guestDto.getPassport());
+            logger.error("guest already exists with full name {}", guestDto.getPassport());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         Guest guestToSave = new Guest(guestDto);
@@ -58,13 +64,14 @@ public class GuestService {
         return new ResponseEntity<>(new GuestDto(guest), HttpStatus.CREATED);
     }
 
+    @CacheEvict("guests")
     public ResponseEntity<GuestDto> remove(long id) {
         if (guestRepository.findById(id).isPresent()) {
             guestRepository.deleteById(id);
             logger.info("remove guest with id {}", id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            logger.warn("guest not found with id {}", id);
+            logger.error("guest not found with id {}", id);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
@@ -77,7 +84,7 @@ public class GuestService {
             logger.info("set apartment with id {} for guest with id {}", apartment.getId(), guest.getId());
             return new ResponseEntity<>(new GuestDto(guest), HttpStatus.OK);
         }
-        logger.warn("set apartment failed with id {} for guest with id {}", apartment.getId(), guest.getId());
+        logger.error("set apartment failed with id {} for guest with id {}", apartment.getId(), guest.getId());
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
@@ -91,6 +98,7 @@ public class GuestService {
         return new ResponseEntity<>(new GuestDto(guest), HttpStatus.OK);
     }
 
+    @Cacheable ("guests")
     public ResponseEntity<List<Guest>> getAll() {
         logger.info("get all guests");
         return new ResponseEntity<>(guestRepository.findAll(), HttpStatus.OK);
