@@ -13,6 +13,11 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 public class ApartmentDto {
+
+    public ApartmentDto(long id) {
+        this.id = id;
+    }
+
     private long id;
     private int apartmentNumber;
     private int roomAmount;

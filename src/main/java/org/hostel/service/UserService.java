@@ -48,7 +48,7 @@ public class UserService {
     public ResponseEntity<RegistredUserDto> add(RegistredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
 
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            logger.warn("user already exists with name {}", userDto.getUsername());
+            logger.error("user already exists with name {}", userDto.getUsername());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // Create new user's account
@@ -93,6 +93,7 @@ public class UserService {
     }
 
     public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) throws UserNotFoundException {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
 

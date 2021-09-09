@@ -9,7 +9,11 @@ import org.hostel.domain.CategoryName;
 @RequiredArgsConstructor
 public class CategoryDto {
 
-        private long id;
+    public CategoryDto(long id) {
+        this.id = id;
+    }
+
+    private long id;
         private CategoryName categoryName;
         private String description;
 
@@ -18,5 +22,6 @@ public class CategoryDto {
         this.categoryName=category.getCategoryName();
         this.description=category.getDescription();
     }
+
 }
 

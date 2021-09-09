@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 @Data
 @RequiredArgsConstructor
 public class GuestDto {
+    public GuestDto(long id) {
+        this.id = id;
+    }
+
     private long id;
     private String fullName;
     private String passport;

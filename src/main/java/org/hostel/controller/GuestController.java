@@ -1,11 +1,14 @@
 package org.hostel.controller;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import lombok.RequiredArgsConstructor;
-import org.hostel.exception.CategoryNotFoundException;
-import org.hostel.exception.GuestNotFoundException;
+import org.hostel.actor.SpringExtension;
 import org.hostel.domain.Guest;
 import org.hostel.dto.GuestDto;
+import org.hostel.exception.GuestNotFoundException;
 import org.hostel.service.GuestService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,7 @@ import java.util.List;
 public class GuestController {
 
     private final GuestService guestService;
+    private final ActorSystem system;
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPTIONIST')")
@@ -30,7 +34,9 @@ public class GuestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPTIONIST')")
     public ResponseEntity<?> remove(@PathVariable("id") long id) {
-        return guestService.remove(id);
+        ActorRef removerActorRef = system.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(system).props("removerActor"), "removerActorRef");
+        removerActorRef.tell (new GuestDto(id), null);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{guestId}")

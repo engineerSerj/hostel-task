@@ -1,11 +1,15 @@
 package org.hostel.controller;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import lombok.RequiredArgsConstructor;
+import org.hostel.actor.SpringExtension;
 import org.hostel.domain.Guest;
 import org.hostel.dto.ApartmentDto;
 import org.hostel.exception.ApartmentNotFoundException;
 import org.hostel.exception.CategoryNotFoundException;
 import org.hostel.service.ApartmentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +22,7 @@ import java.util.List;
 public class ApartmentController {
 
     private final ApartmentService apartmentService;
+    private final ActorSystem system;
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -28,7 +33,9 @@ public class ApartmentController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> remove(@PathVariable("id") long id) throws ApartmentNotFoundException {
-        return apartmentService.remove(id);
+        ActorRef removerActorRef = system.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(system).props("removerActor"), "removerActorRef");
+        removerActorRef.tell (new ApartmentDto(id), null);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{apartmentId}")

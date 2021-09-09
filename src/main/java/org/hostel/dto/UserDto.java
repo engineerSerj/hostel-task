@@ -12,6 +12,11 @@ public class UserDto {
     private String token;
     private final String type = "Bearer";
     private String refreshToken;
+
+    public UserDto(long id) {
+        this.id = id;
+    }
+
     private long id;
     private String username;
     private List <String> roles;
