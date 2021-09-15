@@ -12,7 +12,6 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class RegisteredUserDto implements Serializable {
-    @Nullable
     private long id;
     private String username;
     private String password;
