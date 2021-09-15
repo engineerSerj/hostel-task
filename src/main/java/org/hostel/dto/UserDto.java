@@ -3,6 +3,9 @@ package org.hostel.dto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hostel.domain.User;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,5 +36,11 @@ public class UserDto {
         this.id = id;
         this.username = username;
         this.roles = roles;
+    }
+
+    public UserDto(RegisteredUserDto registeredUserDto) {
+        this.id = registeredUserDto.getId();
+        this.username = registeredUserDto.getUsername();
+        this.roles = new ArrayList<>(Collections.singleton(registeredUserDto.getRoles()));
     }
 }

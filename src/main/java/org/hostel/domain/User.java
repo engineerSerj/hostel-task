@@ -2,7 +2,7 @@ package org.hostel.domain;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hostel.dto.RegistredUserDto;
+import org.hostel.dto.RegisteredUserDto;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User(RegistredUserDto user) {
+    public User(RegisteredUserDto user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();

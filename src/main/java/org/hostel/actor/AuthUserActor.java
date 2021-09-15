@@ -2,7 +2,7 @@ package org.hostel.actor;
 
 import akka.actor.UntypedActor;
 import lombok.RequiredArgsConstructor;
-import org.hostel.dto.RegistredUserDto;
+import org.hostel.dto.RegisteredUserDto;
 import org.hostel.service.ApartmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,15 +19,15 @@ public class AuthUserActor extends UntypedActor {
 
     @Override
     public void onReceive(Object message) throws Throwable {
-        if (message instanceof RegistredUserDto) {
+        if (message instanceof RegisteredUserDto) {
             logger.info("AuthUserActor has got the message");
-            long id = ((RegistredUserDto) message).getId();
-            String username = ((RegistredUserDto) message).getUsername();
-            String password = ((RegistredUserDto) message).getPassword();
-            String roles = ((RegistredUserDto) message).getRoles();
+            long id = ((RegisteredUserDto) message).getId();
+            String username = ((RegisteredUserDto) message).getUsername();
+            String password = ((RegisteredUserDto) message).getPassword();
+            String roles = ((RegisteredUserDto) message).getRoles();
 
             getSender().tell(akkaAuthService.authenticateUser(id, username, password, roles), getSelf());
-            logger.info("AuthUserActor is sending message");
+            logger.info("AuthUserActor has got response");
         } else {
             unhandled(message);
         }

@@ -6,8 +6,7 @@ import akka.util.Timeout;
 import lombok.RequiredArgsConstructor;
 import org.hostel.actor.SpringExtension;
 import org.hostel.dto.RefreshTokenUserDto;
-import org.hostel.dto.RegistredUserDto;
-import org.hostel.dto.UserDto;
+import org.hostel.dto.RegisteredUserDto;
 import org.hostel.exception.RefreshTokenNotFoundException;
 import org.hostel.exception.TokenRefreshException;
 import org.hostel.jms.UserRegistrationTopicListener;
@@ -17,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,19 +47,26 @@ public class AuthController {
     private JmsTemplate topicJmsTemplate;
 
     @PostMapping("/signin")
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) throws Exception {
+    public ResponseEntity<?> authenticateUser(@RequestBody RegisteredUserDto userDto) {
         ActorRef auth = system.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(system).props("authUserActor"), "auth");
-        logger.info( "authUserActor has been created ");
+        logger.info("authUserActor has been created ");
         FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
         Timeout timeout = Timeout.durationToTimeout(duration);
         Future<Object> future = ask(auth, userDto, timeout);
-        ResponseEntity<UserDto> result = (ResponseEntity<UserDto>) Await.result(future, duration);
-        logger.info( "authUserActor future {}",result.toString());
+        ResponseEntity<?> result = null;
+        try {
+            result = (ResponseEntity<?>) Await.result(future, duration);
+        } catch (Exception e) {
+            e.printStackTrace();
+            system.stop(auth);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        logger.info("authUserActor future {}", result.toString());
         return result;
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistredUserDto> registerUser(@RequestBody RegistredUserDto userDto) {
+    public ResponseEntity<RegisteredUserDto> registerUser(@RequestBody RegisteredUserDto userDto) throws InterruptedException {
         // Create new user's account
         topicJmsTemplate.setPubSubDomain(true);
         topicJmsTemplate.send("topic", session -> {
@@ -67,6 +74,7 @@ public class AuthController {
             objectMessage.setObject(userDto);
             return objectMessage;
         });
+        Thread.sleep(350);
         return userRegistrationTopicListener.getResponseEntity();
     }
 

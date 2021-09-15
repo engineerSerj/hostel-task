@@ -2,7 +2,7 @@ package org.hostel.jms;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hostel.dto.RegistredUserDto;
+import org.hostel.dto.RegisteredUserDto;
 import org.hostel.exception.RoleNotFoundException;
 import org.hostel.exception.UserAlreadyExists;
 import org.hostel.service.UserService;
@@ -22,7 +22,7 @@ import javax.jms.ObjectMessage;
 public class UserRegistrationTopicListener {
 
     private final UserService userService;
-    private ResponseEntity<RegistredUserDto> responseEntity;
+    private ResponseEntity<RegisteredUserDto> responseEntity;
 
     private static final Logger logger = LoggerFactory.getLogger(UserRegistrationTopicListener.class);
 
@@ -32,7 +32,7 @@ public class UserRegistrationTopicListener {
             id = "topicListener")
     public void receiveMessageFromTopic(Message jsonMessage) throws RoleNotFoundException, UserAlreadyExists, JMSException {
         ObjectMessage objectMessage = (ObjectMessage) jsonMessage;
-        RegistredUserDto userDto =  (RegistredUserDto)objectMessage.getObject();
+        RegisteredUserDto userDto =  (RegisteredUserDto)objectMessage.getObject();
         logger.info("topic receiver has got a jsonMessage ---->{}", userDto.getClass());
         responseEntity = userService.add(userDto);
     }

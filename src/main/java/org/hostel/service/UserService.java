@@ -3,7 +3,7 @@ package org.hostel.service;
 import lombok.RequiredArgsConstructor;
 import org.hostel.domain.RefreshToken;
 import org.hostel.domain.RoleName;
-import org.hostel.dto.RegistredUserDto;
+import org.hostel.dto.RegisteredUserDto;
 import org.hostel.dto.RoleDto;
 
 import org.hostel.exception.*;
@@ -36,36 +36,39 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
 
-    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
+    private final RoleRepository roleRepository;
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public ResponseEntity<RegistredUserDto> add(RegistredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
+    public ResponseEntity<RegisteredUserDto> add(RegisteredUserDto userDto) throws UserAlreadyExists, RoleNotFoundException {
 
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            logger.error("user already exists with name {}", userDto.getUsername());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // Create new user's account
         User user = new User(userDto);
-        user.setPassword(encoder.encode(user.getPassword()));
+        String encodePassword = encoder.encode(user.getPassword());
+        if(encodePassword!=null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
         Set<Role> userRoles = new HashSet<>();
-        if (userDto.getRoles().contains("ROLE_ADMIN")) {
-            userRoles.add(roleRepository.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new RoleNotFoundException(RoleName.ROLE_ADMIN.name())));
-        } else {
-            Role role = roleRepository.findByRoleName(RoleName.ROLE_RECEPTIONIST).orElseThrow(() -> new RoleNotFoundException(RoleName.ROLE_RECEPTIONIST.name()));
-            userRoles.add(role);
+        if(userDto.getRoles()!=null) {
+            if (userDto.getRoles().contains("ROLE_ADMIN")) {
+                userRoles.add(roleRepository.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(() -> new RoleNotFoundException(RoleName.ROLE_ADMIN.name())));
+            } else if (userDto.getRoles().contains("ROLE_RECEPTIONIST")) {
+                userRoles.add(roleRepository.findByRoleName(RoleName.ROLE_RECEPTIONIST).orElseThrow(() -> new RoleNotFoundException(RoleName.ROLE_RECEPTIONIST.name())));
+            }
         }
         user.setRoles(userRoles);
-        RegistredUserDto registredUserDto = new RegistredUserDto(userRepository.save(user));
-        registredUserDto.setPassword(userDto.getPassword());
-        logger.info("user with name {} and id {} registered", registredUserDto.getUsername(), registredUserDto.getId());
-        return new ResponseEntity<>(registredUserDto, HttpStatus.CREATED);
+        RegisteredUserDto registeredUserDto = new RegisteredUserDto(userRepository.save(user));
+        registeredUserDto.setPassword(userDto.getPassword());
+        logger.info("user with name {} and id {} registered", registeredUserDto.getUsername(), registeredUserDto.getId());
+        return new ResponseEntity<>(registeredUserDto, HttpStatus.CREATED);
     }
 
     public ResponseEntity<UserDto> remove(long id) throws UserNotFoundException {
@@ -92,7 +95,7 @@ public class UserService {
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegistredUserDto userDto) throws UserNotFoundException {
+    public ResponseEntity<UserDto> authenticateUser(@RequestBody RegisteredUserDto userDto) throws UserNotFoundException {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));

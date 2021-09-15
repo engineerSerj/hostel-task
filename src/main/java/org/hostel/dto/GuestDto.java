@@ -32,5 +32,6 @@ public class GuestDto {
         this.birthday = guest.getBirthday();
         this.checkInDate = guest.getCheckInDate();
         this.checkOutDate = guest.getCheckOutDate();
+        this.apartment = guest.getApartment();
     }
 }
