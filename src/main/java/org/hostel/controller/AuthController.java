@@ -74,7 +74,7 @@ public class AuthController {
             objectMessage.setObject(userDto);
             return objectMessage;
         });
-        Thread.sleep(350);
+        Thread.sleep(600);
         return userRegistrationTopicListener.getResponseEntity();
     }
 

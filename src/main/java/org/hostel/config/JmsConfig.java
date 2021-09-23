@@ -16,7 +16,6 @@ import org.springframework.jms.core.JmsTemplate;
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.jms.Topic;
-import java.util.Collections;
 
 
 @Configuration
@@ -42,7 +41,7 @@ public class JmsConfig {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL(broker_url);
         connectionFactory.setMaxThreadPoolSize(20);
-        connectionFactory.setTrustedPackages(Collections.singletonList("org.hostel"));
+        connectionFactory.setTrustAllPackages(true);
 
         return connectionFactory;
     }

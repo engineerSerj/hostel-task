@@ -1,0 +1,25 @@
+version: '3'
+services:
+  activemq:
+    build:
+      context: docker-activemq
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8161:8161"
+    volumes:
+      - ./activemq_data:/lib/activemq/data
+    container_name: activemq
+  app:
+    build:
+      context: docker-openjdk-alpine8
+      dockerfile: Dockerfile
+    command: java -jar ./hostel-1.0-SNAPSHOT.jar --spring.activemq.broker-url=tcp://activemq:61616
+    ports:
+      - "8080:8080"
+    depends_on:
+      - activemq
+    links:
+      - activemq
+
+
